@@ -1,3 +1,13 @@
+/*
+ Учебное задание.
+ Курс: разработчик Android.
+ Группа: Android-5.
+ Раздел: Java Core.
+ Задание: 6.6.* Практика — пишем калькулятор.
+ Исполнитель: inbruk (Шилов Дмитрий).
+ Дата: 15.09.2020.
+*/
+
 import java.util.Arrays;
 import java.util.Scanner;
 
@@ -10,12 +20,43 @@ public class PhoneBook {
     private static String book[][] = new String[currBookSize][2];
 
     public static void main(String[] args) {
+        System.out.println("Курс: разработчик Андроид. Группа android-5. Раздел: Java Core.");
+        System.out.println("Задание 6.6. - Реализуем свой проект и публикуем его на GitHub.");
+        System.out.println("Исполнитель: inbruk (Шилов Дмитрий). Дата: 15.09.2020");
         Scanner scanner = new Scanner(System.in);
 
         while ( true ) {
-            System.out.println("Курс: разработчик Андроид. Группа android-5. ");
+            System.out.println("Курс: разработчик Андроид. Группа android-5. Раздел: Java Core.");
+            System.out.println("Задание 6.6. - Реализуем свой проект и публикуем его на GitHub.");
+            System.out.println("Исполнитель: inbruk (Шилов Дмитрий). Дата: 08.09.2020");
+            System.out.println();
+            System.out.println("Использование: введите Фамилию Имя Отчество, или команду: list, quit");
             String fioRawStr = scanner.nextLine();
-           // String fioStr =
+
+            if( fioRawStr.equals("list") ) {
+                list();
+                return;
+            }
+
+            if( fioRawStr.equals("quit") ) {
+                return;
+            }
+
+            if( checkNameFormat(fioRawStr)==false ) {
+                System.out.println("Вы ввели ФИО неправильного формата. Нужно вводить: Фамилия Имя Отчество");
+                continue;
+            }
+
+            String phoneNumber = getPhoneFromBookByName(fioRawStr);
+            if( phoneNumber==null) {
+                System.out.println("Абонента с таким именем в справочнике нет.");
+                System.out.println("Введите его телефон для добавления: ");
+                String newRawPhoneStr = scanner.nextLine();
+                String newPhoneStr = formatPhoneNumber(newRawPhoneStr);
+                add(fioRawStr, newPhoneStr);
+            } else {
+                System.out.println("Телефон абонента с такими ФИО:" + phoneNumber);
+            }
         }
     }
 
@@ -55,7 +96,7 @@ public class PhoneBook {
         return null;
     }
 
-    public static void add(String[][] book, String name, String number) {
+    public static void add(String name, String number) {
         if( currBookFillSize==currBookSize ){
             String[][] tempBook = Arrays.copyOf(book, currBookSize + currBookIncSize);
             book = Arrays.copyOf(tempBook, currBookSize + currBookIncSize);
@@ -64,7 +105,7 @@ public class PhoneBook {
         currBookFillSize++;
     }
 
-    public static void list(String[][] book) {
+    public static void list() {
         System.out.println();
         for(int i=0;i<book.length;i++ )
             System.out.println(book[i][0] + ": " + book[i][1]);
