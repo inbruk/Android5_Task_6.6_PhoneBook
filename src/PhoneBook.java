@@ -1,4 +1,6 @@
+import java.util.Comparator;
 import java.util.Scanner;
+import java.util.Arrays;
 
 public class PhoneBook {
 
@@ -35,7 +37,7 @@ public class PhoneBook {
             String fioRawStr = scanner.nextLine();
 
             if( fioRawStr.equals("list") ) {
-                enlistTheBook();
+                enlistTheBookWithSorting();
                 continue;
             }
 
@@ -129,7 +131,21 @@ public class PhoneBook {
         currBookFillSize++;
     }
 
-    public static void enlistTheBook() {
+    // Used for sorting in ascending order by FIO
+    private static class SortByFIO implements Comparator< String[] > {
+        public int compare(String[] a, String[] b) {
+            return a[0].compareTo( b[0] );
+        }
+    }
+
+    public static void enlistTheBookWithSorting() {
+        // сортируем заполненную часть массива
+        String[][] tempBook = Arrays.copyOf(book, currBookFillSize);
+        Arrays.sort(tempBook, new SortByFIO());
+        for(int i=0;i<currBookFillSize;i++ )
+            book[i] = tempBook[i];
+
+        // собственно выводим заполненную часть в консоль
         System.out.println();
         for(int i=0;i<currBookFillSize;i++ )
             System.out.println(book[i][0] + ": " + book[i][1]);
