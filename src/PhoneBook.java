@@ -1,14 +1,3 @@
-/*
- Учебное задание.
- Курс: разработчик Android.
- Группа: Android-5.
- Раздел: Java Core.
- Задание: 6.6.* Практика — пишем калькулятор.
- Исполнитель: inbruk (Шилов Дмитрий).
- Дата: 15.09.2020.
-*/
-
-import java.util.Arrays;
 import java.util.Scanner;
 
 public class PhoneBook {
@@ -20,22 +9,34 @@ public class PhoneBook {
     private static String book[][] = new String[currBookSize][2];
 
     public static void main(String[] args) {
+        System.out.println();
         System.out.println("Курс: разработчик Андроид. Группа android-5. Раздел: Java Core.");
-        System.out.println("Задание 6.6. - Реализуем свой проект и публикуем его на GitHub.");
+        System.out.println("Задание 6.6 - Реализуем свой проект и публикуем его на GitHub.");
         System.out.println("Исполнитель: inbruk (Шилов Дмитрий). Дата: 15.09.2020");
+        System.out.println();
+
+        System.out.print("Выполняется предварительное заполнение справочника");
+        addToBook("Иванов Иван Иванович", checkAndFormatPhoneNumber("8 911 999 99 99"));
+        System.out.print(".");
+        addToBook("Сергеева Мария Анатольевна", checkAndFormatPhoneNumber("8 888 454 33 33"));
+        System.out.print(".");
+        addToBook("Яшкин Валентин Петрович", checkAndFormatPhoneNumber("8 788 567 44 44"));
+        System.out.print(".");
+        addToBook("Бормотуха Иван Петрович", checkAndFormatPhoneNumber("+7(808)-333-67-56"));
+        System.out.print(".");
+        addToBook("Лумумба Патрис Пьерович", checkAndFormatPhoneNumber("+7 905 777 35 45"));
+        System.out.println("!");
+
         Scanner scanner = new Scanner(System.in);
 
         while ( true ) {
-            System.out.println("Курс: разработчик Андроид. Группа android-5. Раздел: Java Core.");
-            System.out.println("Задание 6.6. - Реализуем свой проект и публикуем его на GitHub.");
-            System.out.println("Исполнитель: inbruk (Шилов Дмитрий). Дата: 08.09.2020");
-            System.out.println();
-            System.out.println("Использование: введите Фамилию Имя Отчество, или команду: list, quit");
+            System.out.println("Использование: введите Фамилия Имя Отчество, или команду: list, quit");
+            System.out.print("=> ");
             String fioRawStr = scanner.nextLine();
 
             if( fioRawStr.equals("list") ) {
-                list();
-                return;
+                enlistTheBook();
+                continue;
             }
 
             if( fioRawStr.equals("quit") ) {
@@ -43,19 +44,29 @@ public class PhoneBook {
             }
 
             if( checkNameFormat(fioRawStr)==false ) {
-                System.out.println("Вы ввели ФИО неправильного формата. Нужно вводить: Фамилия Имя Отчество");
+                System.out.println("Вы ввели ФИО неправильного формата. Нужно вводить: Фамилия Имя Отчество.");
+                System.out.println("Повторите попытку !");
+                System.out.println();
                 continue;
             }
 
             String phoneNumber = getPhoneFromBookByName(fioRawStr);
             if( phoneNumber==null) {
-                System.out.println("Абонента с таким именем в справочнике нет.");
-                System.out.println("Введите его телефон для добавления: ");
+                System.out.println("Абонента с таким ФИО в справочнике нет.");
+                System.out.println("Введите его/ее телефон для добавления: ");
                 String newRawPhoneStr = scanner.nextLine();
-                String newPhoneStr = formatPhoneNumber(newRawPhoneStr);
-                add(fioRawStr, newPhoneStr);
+
+                String newPhoneStr = checkAndFormatPhoneNumber(newRawPhoneStr);
+                if( newPhoneStr==null ) { // если ввели некорректный номер телефона
+                    System.out.println("Вы ввели номер телефона неправильного формата. Нужно вводить 11 цифр.");
+                    System.out.println("Повторите попытку добавления записи в справочник сначала !");
+                    System.out.println();
+                    continue;
+                } else {
+                    addToBook(fioRawStr, newPhoneStr);
+                }
             } else {
-                System.out.println("Телефон абонента с такими ФИО:" + phoneNumber);
+                System.out.println("Телефон абонента с такими ФИО: " + phoneNumber);
             }
         }
     }
@@ -66,7 +77,7 @@ public class PhoneBook {
     }
 
     public static boolean checkNameFormat(String name) {
-        if ( name.matches("[^a-zA-Zа-яА-Я]")==true )
+        if ( name.matches("[a-zA-Zа-яА-Я\\s]+")==false )
             return false;
 
         String[] words = name.trim().split(" ");
@@ -80,34 +91,48 @@ public class PhoneBook {
         return true;
     }
 
-    public static String formatPhoneNumber(String phoneNumber) {
-        String clean = phoneNumber.replaceAll("[^0-9]", "");
-        String result = "+7" + " " + clean.substring(1, 4) + " " +
-                clean.substring(4, 7) + " " + clean.substring(7, 9) + " " + clean.substring(9);
+    public static String checkAndFormatPhoneNumber(String phoneNumber) {
+        String result;
+
+        try {
+            String clean = phoneNumber.replaceAll("[^0-9]", "");
+            result = "+7" + " " + clean.substring(1, 4) + " " +
+                    clean.substring(4, 7) + " " + clean.substring(7, 9) + " " + clean.substring(9);
+        }
+        catch(Exception e) {
+            result = null; // в случае ввода некорректного номера телефона
+        }
 
         return result;
     }
 
     public static String getPhoneFromBookByName(String name) {
-        for(int i=0;i<book.length;i++) {
+        for(int i=0;i<currBookFillSize;i++) {
             if( book[i][0].equals(name) )
                 return book[i][1];
         }
         return null;
     }
 
-    public static void add(String name, String number) {
+    public static void addToBook(String name, String number) {
         if( currBookFillSize==currBookSize ){
-            String[][] tempBook = Arrays.copyOf(book, currBookSize + currBookIncSize);
-            book = Arrays.copyOf(tempBook, currBookSize + currBookIncSize);
+            String[][] tempBook = book;
+            book = new String[currBookSize + currBookIncSize][2];
+            for(int i=0;i<currBookSize;i++) {
+                book[i][0] = tempBook[i][0];
+                book[i][1] = tempBook[i][1];
+            }
+            currBookSize = book.length;
         }
-        currBookSize = book.length;
+        book[currBookFillSize][0] = name;
+        book[currBookFillSize][1] = number;
         currBookFillSize++;
     }
 
-    public static void list() {
+    public static void enlistTheBook() {
         System.out.println();
-        for(int i=0;i<book.length;i++ )
+        for(int i=0;i<currBookFillSize;i++ )
             System.out.println(book[i][0] + ": " + book[i][1]);
+        System.out.println();
     }
 }
